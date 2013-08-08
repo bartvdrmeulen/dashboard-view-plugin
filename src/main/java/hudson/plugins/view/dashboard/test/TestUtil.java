@@ -7,6 +7,10 @@ import hudson.model.TopLevelItem;
 import hudson.tasks.junit.TestResultAction;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResultProjectAction;
+import org.tap4j.plugin.TapTestResultAction;
+import org.tap4j.plugin.TapProjectAction;
+import org.tap4j.plugin.TapBuildAction;
+import org.tap4j.plugin.TapResult;
 
 import java.util.Collection;
 
@@ -40,6 +44,18 @@ public class TestUtil {
                     if (surefireTestResults != null) {
                        addBlank = false;
                        summary.addTestResult(new TestResult(job, surefireTestResults.getTotalCount(), surefireTestResults.getFailCount(), surefireTestResults.getSkipCount()));
+                    } else {
+                       TapProjectAction tpa = job.getAction(TapProjectAction.class);
+                       if (tpa != null) {
+                          TapBuildAction tba = tpa.getLastBuildAction();
+                             if (tba != null) {
+                                TapResult tr = tba.getResult();
+                                if (tr != null) {
+                                   addBlank = false;
+                                   summary.addTestResult(new TestResult(job, tr.getTotal(), tr.getFailed(), tr.getSkipped()));
+                                }
+                             }
+                       }
                     }
                 }
 
@@ -63,6 +79,11 @@ public class TestUtil {
          return new TestResult(run.getParent(), surefireTestResults.getTotalCount(), surefireTestResults.getFailCount(), surefireTestResults.getSkipCount());
       }
       
+      TapTestResultAction ttra = run.getAction(TapTestResultAction.class);
+      if (ttra != null) {
+         return new TestResult(run.getParent(), ttra.getTotalCount(), ttra.getFailCount(), ttra.getSkipCount());
+      }
+
       return new TestResult(run.getParent(), 0, 0, 0);
    }
 }

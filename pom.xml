@@ -53,6 +53,11 @@
 			<artifactId>maven-plugin</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.tap4j</groupId>
+			<artifactId>tap</artifactId>
+			<version>1.13</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
